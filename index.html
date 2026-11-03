@@ -136,6 +136,14 @@ h1{
 .cd b{font-family:"Grenze Gotisch",serif;font-weight:700;color:var(--red);font-size:2.3rem;line-height:1;font-variant-numeric:tabular-nums}
 .cd span{font-style:italic;font-size:.82rem;color:#7A6455;margin-top:4px}
 
+.xmas{font-family:"Great Vibes",cursive;color:var(--red);font-size:2.2rem;line-height:1;margin-top:12px;position:relative;z-index:1}
+.fest{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden}
+.fest i{position:absolute;top:-50px;display:block;animation:fest-fall linear forwards;will-change:transform}
+.fest i svg{width:100%;height:auto;display:block}
+.fest .fl{border-radius:50%;background:#FFFFFF;box-shadow:0 0 6px rgba(255,255,255,.9)}
+.fest .hr{color:var(--red)} .fest .hp{color:#F29A8C} .fest .st{color:#E8B43C}
+@keyframes fest-fall{0%{transform:translate3d(0,0,0) rotate(0);opacity:1}90%{opacity:1}100%{transform:translate3d(var(--dx),112vh,0) rotate(var(--rot));opacity:0}}
+
 @media (prefers-reduced-motion: reduce){
   .card.today .tbow,.note{animation:none}
   .card,.toast{transition:none}
@@ -169,6 +177,7 @@ h1{
     <span class="cb bl" data-bow></span><span class="cb br" data-bow></span>
     <div class="day" id="cDay"></div>
     <div class="month">december</div>
+    <div class="xmas" id="cXmas" hidden>Veselé Vianoce</div>
     <div class="doodle" id="cDoodle"></div>
     <p id="cText"></p>
     <button class="btn btn-done" id="cDone" type="button"></button>
@@ -308,6 +317,8 @@ function openNote(day){
   document.getElementById("cDay").textContent = day + ".";
   document.getElementById("cText").textContent = CH[day-1];
   document.getElementById("cDoodle").innerHTML = DOODLES[DOODLE_OF[day-1]];
+  document.getElementById("cXmas").hidden = day !== 24;
+  if(day === 24) celebrate();
   setDoneBtn();
   overlay.classList.add("open");
   document.getElementById("cDone").focus();
@@ -335,6 +346,32 @@ function showToast(msg){
   toast.textContent = msg; toast.classList.add("show");
   clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove("show"), 2600);
 }
+const HEART = '<svg viewBox="0 0 40 40"><path d="M20 34C6 24.5 5 13.5 12.5 10.5 16.5 9 19.5 12 20 14c.5-2 3.5-5 7.5-3.5C35 13.5 34 24.5 20 34Z" fill="currentColor"/></svg>';
+const STAR = '<svg viewBox="0 0 40 40"><path d="M20 5l4.3 9.4 10.2 1.2-7.6 7 2.1 10.1L20 27.6l-9 5.1 2.1-10.1-7.6-7 10.2-1.2Z" fill="currentColor"/></svg>';
+function celebrate(){
+  if(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const old = document.querySelector(".fest"); if(old) old.remove();
+  const layer = document.createElement("div");
+  layer.className = "fest"; layer.setAttribute("aria-hidden", "true");
+  const n = window.innerWidth < 600 ? 110 : 170;
+  for(let i = 0; i < n; i++){
+    const e = document.createElement("i"), r = Math.random();
+    let size;
+    if(r < .6){ e.className = "fl"; size = 3 + Math.random() * 6; e.style.height = size + "px"; }
+    else if(r < .88){ e.className = Math.random() < .6 ? "hr" : "hp"; size = 16 + Math.random() * 20; e.innerHTML = HEART; }
+    else { e.className = "st"; size = 13 + Math.random() * 12; e.innerHTML = STAR; }
+    e.style.width = size + "px";
+    e.style.left = (Math.random() * 100) + "vw";
+    e.style.setProperty("--dx", ((Math.random() - .5) * 140) + "px");
+    e.style.setProperty("--rot", ((Math.random() - .5) * 540) + "deg");
+    e.style.animationDuration = (4.5 + Math.random() * 4) + "s";
+    e.style.animationDelay = (Math.random() * 4.5) + "s";
+    layer.appendChild(e);
+  }
+  document.body.appendChild(layer);
+  setTimeout(() => layer.remove(), 10000);
+}
+
 const TARGET = new Date(2026, 11, 1, 0, 0, 0);
 const wait = document.getElementById("wait");
 let waitT = null;
