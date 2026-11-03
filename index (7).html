@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Adventný kalendár</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Grenze+Gotisch:wght@600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --page:#FBF7E8; --ink:#3A2A1E; --muted:#7A6455;
+  --title:#2E6B45; --script:#C8342B;
+  --paper:#FFFCEB; --red:#C8342B; --green:#2E6B45; --pink:#F6C2B2; --sage:#B7CBB2; --kraft:#F4E7D3;
+  --shadow:rgba(80,50,20,.16);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --page:#1E3A2B; --ink:#FBF3DF; --muted:#C9D6C6; --title:#FBF3DF; --script:#F6C2B2; --shadow:rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#1E3A2B; --ink:#FBF3DF; --muted:#C9D6C6; --title:#FBF3DF; --script:#F6C2B2; --shadow:rgba(0,0,0,.35);
+}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;min-height:100%;color:var(--ink);
+  font-family:"Lora",Georgia,"Times New Roman",serif;
+  background-color:var(--page);
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45 0 0 0 0 .32 0 0 0 0 .2 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+main{max-width:460px;margin:0 auto;padding:34px 18px 52px;text-align:center}
+
+.head{position:relative;display:inline-block;padding:0 34px}
+h1{
+  font-family:"Great Vibes","Snell Roundhand",cursive;font-weight:400;color:var(--title);
+  font-size:clamp(3rem,15vw,4rem);line-height:1;margin:0;
+}
+.head .bow{position:absolute;width:44px;color:var(--red)}
+.head .b1{left:-6px;top:-14px;transform:rotate(-18deg)}
+.head .b2{right:-8px;bottom:-12px;transform:rotate(14deg)}
+.sub{font-family:"Great Vibes",cursive;color:var(--script);font-size:1.55rem;line-height:1.2;margin:10px auto 0;max-width:20ch}
+.status{margin:18px auto 0;max-width:32ch;font-style:italic;line-height:1.5;color:var(--ink)}
+
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 10px;margin:26px auto 0;padding-top:10px}
+.card{
+  position:relative;aspect-ratio:3/4;border:0;padding:0;cursor:pointer;border-radius:3px;
+  box-shadow:0 2px 0 rgba(0,0,0,.04),0 4px 10px var(--shadow);
+  display:grid;place-items:center;transition:transform .18s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.card:hover{transform:translateY(-3px) rotate(-1deg)}
+.card:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+.v-pink{background:repeating-linear-gradient(90deg,var(--pink) 0 9px,var(--paper) 9px 18px)}
+.v-sage{background:repeating-linear-gradient(90deg,var(--sage) 0 9px,var(--paper) 9px 18px)}
+.v-red{background:repeating-linear-gradient(90deg,var(--red) 0 5px,var(--paper) 5px 11px)}
+.v-green{background:repeating-linear-gradient(90deg,var(--green) 0 4px,var(--paper) 4px 11px)}
+.v-frame{background:var(--paper)}
+.v-frame::after{content:"";position:absolute;inset:6px;border:1.5px solid var(--red);box-shadow:inset 0 0 0 2px var(--paper),inset 0 0 0 3px var(--red);border-radius:2px;pointer-events:none}
+.v-lace{background:var(--kraft)}
+.v-lace::after{content:"";position:absolute;inset:5px;border:2.5px dotted var(--green);border-radius:8px;pointer-events:none}
+.med{
+  position:relative;z-index:1;width:76%;height:66%;border-radius:50% / 44%;
+  background:var(--paper);border:1.5px solid currentColor;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+}
+.v-frame .med,.v-lace .med{background:none;border:0}
+.med svg{width:52%;height:auto;display:block}
+.num{font-family:"Grenze Gotisch","Old English Text MT",serif;font-weight:700;font-size:clamp(1.15rem,5.2vw,1.55rem);line-height:1}
+.c-red{color:var(--red)} .c-green{color:var(--green)}
+
+.card.locked{opacity:.42;filter:saturate(.55)}
+.card.locked:hover{transform:none}
+.card.today{transform:rotate(-2deg);z-index:2}
+.card.today .tbow{position:absolute;top:-17px;left:50%;width:52%;transform:translateX(-50%);color:var(--red);z-index:3;animation:wiggle 3s ease-in-out infinite;transform-origin:50% 30%}
+@keyframes wiggle{0%,80%,100%{transform:translateX(-50%) rotate(0)}86%{transform:translateX(-50%) rotate(-9deg)}93%{transform:translateX(-50%) rotate(7deg)}}
+.check{position:absolute;right:-7px;bottom:-7px;width:30px;height:30px;border-radius:50%;background:var(--paper);box-shadow:0 1px 4px var(--shadow);display:grid;place-items:center;z-index:3;color:var(--green)}
+.check svg{width:20px;height:20px}
+
+.progress{margin:30px auto 0;font-style:italic;color:var(--muted)}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:250px;margin:10px auto 0}
+.dots i{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--muted);opacity:.6}
+.dots i.on{background:var(--red);border-color:var(--red);opacity:1}
+.hint{margin-top:24px;font-size:.88rem;color:var(--muted);line-height:1.5}
+
+.overlay{
+  position:fixed;inset:0;z-index:10;display:none;place-items:center;
+  padding:calc(24px + env(safe-area-inset-top,0px)) 22px calc(24px + env(safe-area-inset-bottom,0px));
+  background:rgba(40,26,14,.55);
+}
+.overlay.open{display:grid}
+.note{
+  position:relative;width:min(100%,360px);background:var(--paper);color:#3A2A1E;
+  padding:52px 34px 34px;text-align:center;border-radius:3px;
+  box-shadow:0 24px 50px rgba(0,0,0,.35);
+  transform-origin:50% -60px;animation:swing .7s cubic-bezier(.25,1.4,.4,1);
+}
+.note::before{content:"";position:absolute;inset:12px;border:2px solid var(--red);pointer-events:none}
+.note::after{content:"";position:absolute;inset:17px;border:1px solid var(--red);pointer-events:none}
+.note .cb{position:absolute;width:52px;color:var(--red);z-index:1}
+.cb.tl{top:-4px;left:-4px;transform:rotate(-30deg)}
+.cb.tr{top:-4px;right:-4px;transform:rotate(30deg)}
+.cb.bl{bottom:-6px;left:-4px;transform:rotate(-150deg)}
+.cb.br{bottom:-6px;right:-4px;transform:rotate(150deg)}
+@keyframes swing{0%{transform:rotate(-8deg) translateY(-30px);opacity:0}60%{transform:rotate(2.5deg);opacity:1}100%{transform:rotate(0)}}
+.note .day{font-family:"Grenze Gotisch",serif;font-weight:700;color:var(--red);font-size:3.4rem;line-height:.9}
+.note .month{font-family:"Great Vibes",cursive;color:var(--green);font-size:2rem;line-height:1;margin-top:2px}
+.note .doodle{width:56px;margin:14px auto 8px;color:var(--green)}
+.note p{font-size:1.25rem;line-height:1.5;margin:0 auto 26px;max-width:22ch;position:relative;z-index:1}
+.btn{font:inherit;font-weight:600;border:0;cursor:pointer;position:relative;z-index:1}
+.btn:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+.btn-done{background:var(--red);color:var(--paper);border-radius:999px;padding:12px 26px;font-size:1rem;min-width:180px}
+.btn-done.is-done{background:var(--green)}
+.btn-close{display:block;margin:12px auto 0;background:none;color:var(--red);text-decoration:underline;text-underline-offset:3px;padding:8px 14px;font-style:italic}
+
+.toast{
+  position:fixed;left:50%;z-index:20;bottom:calc(22px + env(safe-area-inset-bottom,0px));
+  transform:translate(-50%,16px);opacity:0;pointer-events:none;
+  background:var(--paper);color:var(--red);border:1.5px solid var(--red);
+  padding:12px 18px;border-radius:3px;max-width:min(90vw,340px);font-style:italic;line-height:1.4;
+  transition:opacity .25s ease,transform .25s ease;box-shadow:0 8px 24px rgba(0,0,0,.2);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.wait-title{font-family:"Great Vibes",cursive;color:var(--green);font-size:2.7rem;line-height:1;position:relative;z-index:1}
+.wait-sub{font-style:italic;margin:8px 0 16px;font-size:1.15rem;position:relative;z-index:1}
+.cd{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 0 26px;position:relative;z-index:1}
+.cd div{display:flex;flex-direction:column;align-items:center}
+.cd b{font-family:"Grenze Gotisch",serif;font-weight:700;color:var(--red);font-size:2.3rem;line-height:1;font-variant-numeric:tabular-nums}
+.cd span{font-style:italic;font-size:.82rem;color:#7A6455;margin-top:4px}
+
+@media (prefers-reduced-motion: reduce){
+  .card.today .tbow,.note{animation:none}
+  .card,.toast{transition:none}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="1.6"/></filter>
+</svg>
+
+<main>
+  <div class="head">
+    <span class="bow b1" data-bow></span>
+    <h1>Adventný kalendár</h1>
+    <span class="bow b2" data-bow></span>
+  </div>
+  <p class="sub">pre tých, čo Vianoce až tak nemusia</p>
+  <p class="status" id="status"></p>
+
+  <div class="grid" id="grid"></div>
+
+  <p class="progress" id="progress"></p>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p class="hint">Každý deň sa otvorí jedno okienko.<br>Splnené výzvy si apka pamätá v tvojom telefóne.</p>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="note" role="dialog" aria-modal="true" aria-labelledby="cText">
+    <span class="cb tl" data-bow></span><span class="cb tr" data-bow></span>
+    <span class="cb bl" data-bow></span><span class="cb br" data-bow></span>
+    <div class="day" id="cDay"></div>
+    <div class="month">december</div>
+    <div class="doodle" id="cDoodle"></div>
+    <p id="cText"></p>
+    <button class="btn btn-done" id="cDone" type="button"></button>
+    <button class="btn btn-close" id="cClose" type="button">Zavrieť</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="overlay" id="wait">
+  <div class="note" role="dialog" aria-modal="true" aria-labelledby="wTitle">
+    <span class="cb tl" data-bow></span><span class="cb tr" data-bow></span>
+    <span class="cb bl" data-bow></span><span class="cb br" data-bow></span>
+    <div class="doodle" id="wDoodle"></div>
+    <div class="wait-title" id="wTitle">Ešte si tu skoro</div>
+    <div class="wait-sub">príď o:</div>
+    <div class="cd">
+      <div><b id="cdD">0</b><span id="cdDl">dní</span></div>
+      <div><b id="cdH">0</b><span id="cdHl">hodín</span></div>
+      <div><b id="cdM">0</b><span id="cdMl">minút</span></div>
+      <div><b id="cdS">0</b><span id="cdSl">sekúnd</span></div>
+    </div>
+    <button class="btn btn-done" id="wClose" type="button">Pozrieť kalendár</button>
+  </div>
+</div>
+
+<script>
+const CH = [
+  "Pusti si vianočnú pesničku.",
+  "Prečítaj si kapitolu knižky pod dekou.",
+  "Daruj sladkosť niekomu, kto si to zaslúži.",
+  "Zapáľ si vianočnú sviečku, ktorá rozvonia byt.",
+  "Choď sa pozrieť na vianočné mesto.",
+  "Ozdob si vianočný stromček.",
+  "Uži si večer pri vianočnom stromčeku.",
+  "Napíš vianočný list pre svoju lásku a daj ho pod stromček.",
+  "Urob si večer kakao.",
+  "Pozri si vianočnú rozprávku.",
+  "Choď na vianočné trhy.",
+  "Upeč si vianočný koláč.",
+  "Uvar si vianočný punč.",
+  "Vyzdob vianočne miestnosť, ktorá ešte nie je vyzdobená.",
+  "Uži si večer v pyžamku s dobrým jedlom.",
+  "Pošli vianočné pohľadnice najbližším.",
+  "Napíšte si navzájom tri najkrajšie spomienky z tohto roka.",
+  "Priprav si vianočné raňajky.",
+  "Vyskúšaj nový recept na vianočné koláčiky.",
+  "Dokúp vianočné darčeky.",
+  "Choď so svojou láskou na zimnú prechádzku.",
+  "Urobte si vianočné fotenie.",
+  "Zabaľ vianočné darčeky.",
+  "Vianočná pusa pod stromčekom."
+];
+const DOODLE_OF = ["star","heart","cane","star","tree","tree","tree","heart","mug","star","cane","ginger","mug","stocking","stocking","gift","heart","mug","ginger","gift","heart","star","gift","bow"];
+
+const P = 'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#rough)"';
+const DOODLES = {
+  tree:'<svg viewBox="0 0 40 40" '+P+'><path d="M20 5 11 16h5L8 25.5h6L6 34.5h28l-8-9h6L24 16h5Z"/><path d="M18 34.5V38h4v-3.5"/><circle cx="17" cy="20" r=".8"/><circle cx="23" cy="27" r=".8"/><circle cx="15" cy="29" r=".8"/></svg>',
+  ginger:'<svg viewBox="0 0 40 40" '+P+'><circle cx="20" cy="10" r="5.2"/><path d="M15.5 16.5c-4.5.5-8.5 1.5-8 4.2.4 2 4 1.6 6.3 1.3L13 32.5c-.3 3.4 4 3.6 5 .8L20 28l2 5.3c1 2.8 5.3 2.6 5-.8L26.2 22c2.3.3 5.9.7 6.3-1.3.5-2.7-3.5-3.7-8-4.2"/><circle cx="20" cy="20" r=".6"/><circle cx="20" cy="24" r=".6"/><path d="M18 12c1 .9 3 .9 4 0"/></svg>',
+  mug:'<svg viewBox="0 0 40 40" '+P+'><path d="M9 17h19v12c0 4-3 7-7 7h-5c-4 0-7-3-7-7Z"/><path d="M28 20.5c5.5-.5 5.5 8 0 7.5"/><path d="M15 13c-2-2.5 2-4 0-7M22 13c-2-2.5 2-4 0-7"/><path d="M18.5 27.5c-2-1.5-1.5-3.5 0-3 1.5-1.5 3 .5 0 3Z"/></svg>',
+  cane:'<svg viewBox="0 0 40 40" fill="none" stroke-linecap="round" filter="url(#rough)"><path d="M24 36V15c0-8-12-8-12 0" stroke="currentColor" stroke-width="6"/><path d="M24 36V15c0-8-12-8-12 0" stroke="#FFFCEB" stroke-width="3.4" stroke-dasharray="3 3.6"/></svg>',
+  stocking:'<svg viewBox="0 0 40 40" '+P+'><path d="M14 10v12c-5 2-7.5 7-4 11 3.5 3.5 11 3 14-1.5l3-5V10Z"/><path d="M12.5 4h16v6h-16Z"/><circle cx="18" cy="16" r=".6"/><circle cx="22" cy="21" r=".6"/><circle cx="17" cy="27" r=".6"/></svg>',
+  gift:'<svg viewBox="0 0 40 40" '+P+'><path d="M8 17h24v18H8Z"/><path d="M6 12.5h28V17H6Z"/><path d="M20 12.5V35"/><path d="M20 12.5c-6-7-11-2-7 0Zm0 0c6-7 11-2 7 0Z"/></svg>',
+  star:'<svg viewBox="0 0 40 40" '+P+'><path d="M20 5l4.3 9.4 10.2 1.2-7.6 7 2.1 10.1L20 27.6l-9 5.1 2.1-10.1-7.6-7 10.2-1.2Z"/></svg>',
+  heart:'<svg viewBox="0 0 40 40" '+P+'><path d="M20 34C6 24.5 5 13.5 12.5 10.5 16.5 9 19.5 12 20 14c.5-2 3.5-5 7.5-3.5C35 13.5 34 24.5 20 34Z"/></svg>',
+  bow:'<svg viewBox="0 0 40 40" '+P+'><path d="M20 15c-6-9-15-6-12 0 2 4 8 2 12 0Zm0 0c6-9 15-6 12 0-2 4-8 2-12 0Z"/><path d="M19 16c-3 6-6 11-9 17M21 16c3 6 6 11 9 17"/><circle cx="20" cy="15.5" r="1.8"/></svg>'
+};
+const BOW = '<svg viewBox="0 0 60 50" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="url(#rough)"><path d="M30 18C22 4 6 6 10 16c3 7 13 5 20 2Zm0 0c8-14 24-12 20-2-3 7-13 5-20 2Z"/><path d="M28 20c-4 9-9 17-15 26M32 20c3 8 8 16 13 24"/><path d="M27.5 17.5c1-2 4-2 5 0 .6 1.6-.6 3-2.5 3s-3.2-1.4-2.5-3Z"/></svg>';
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="url(#rough)"><path d="M5 13l4.5 4.5L19 6"/></svg>';
+
+document.querySelectorAll("[data-bow]").forEach(e => e.innerHTML = BOW);
+
+const ORDER = [7,15,3,20,11,1,18,9,22,5,13,24,2,17,10,23,6,14,19,4,12,21,8,16];
+const VARS = [["v-pink","c-red"],["v-frame","c-green"],["v-sage","c-green"],["v-lace","c-red"],["v-red","c-red"],["v-green","c-red"],["v-frame","c-red"],["v-pink","c-green"],["v-lace","c-green"]];
+const KEY = "advent-na-skusku";
+
+const grid = document.getElementById("grid");
+const overlay = document.getElementById("overlay");
+const toast = document.getElementById("toast");
+let state = load(), currentDay = null, toastT = null;
+
+function load(){
+  try{ const v = JSON.parse(localStorage.getItem(KEY)); if(v && Array.isArray(v.done)) return v; }catch(e){}
+  return {done:[]};
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function preview(){ return location.hash === "#nahlad"; }
+function calendar(){
+  const d = new Date(), m = d.getMonth(), day = d.getDate();
+  if(preview()) return {open:24, today:null, m, day};
+  if(m === 11) return {open:Math.min(day,24), today: day<=24 ? day : null, m, day};
+  if(m === 0) return {open:24, today:null, m, day};
+  return {open:0, today:null, m, day};
+}
+function plural(n){ return n===1 ? "deň" : (n>=2 && n<=4 ? "dni" : "dní"); }
+function statusText(c){
+  if(preview()) return "Režim náhľadu: všetky okienka sú odomknuté.";
+  if(c.m === 11){
+    if(c.day < 24) return "Dnes je " + c.day + ". december. Tvoje dnešné okienko má mašľu.";
+    if(c.day === 24) return "Je Štedrý deň. Posledné okienko patrí tebe.";
+    return "Vianoce sú tu. Všetky okienka zostávajú otvorené.";
+  }
+  if(c.m === 0) return "Vianoce sú za nami. Všetky okienka zostávajú otvorené.";
+  const now = new Date(); now.setHours(0,0,0,0);
+  const n = Math.round((new Date(now.getFullYear(), 11, 1) - now) / 86400000);
+  return "Prvé okienko sa otvorí 1. decembra. Zostáva " + n + " " + plural(n) + ".";
+}
+
+function render(){
+  const c = calendar();
+  document.getElementById("status").textContent = statusText(c);
+  grid.innerHTML = "";
+  ORDER.forEach((day, i) => {
+    const [v, col] = VARS[i % VARS.length];
+    const open = day <= c.open, done = state.done.includes(day);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "card " + v + (open ? "" : " locked") + (c.today === day ? " today" : "") + (done ? " done" : "");
+    b.dataset.day = day;
+    b.innerHTML = '<span class="med ' + col + '">' + DOODLES[DOODLE_OF[day-1]] + '<span class="num">' + day + '</span></span>' +
+      (c.today === day ? '<span class="tbow">' + BOW + '</span>' : '') +
+      (done ? '<span class="check">' + CHECK + '</span>' : '');
+    b.setAttribute("aria-label", day + ". december" + (!open ? ", zatiaľ zamknuté" : done ? ", splnené" : ""));
+    b.addEventListener("click", () => {
+      if(!open){ showToast("Ešte trpezlivosť. Toto okienko sa otvorí " + day + ". decembra."); return; }
+      openNote(day);
+    });
+    grid.appendChild(b);
+  });
+  document.getElementById("progress").textContent = "Splnené výzvy: " + state.done.length + " z 24";
+  const dots = document.getElementById("dots"); dots.innerHTML = "";
+  for(let d = 1; d <= 24; d++){ const e = document.createElement("i"); if(state.done.includes(d)) e.className = "on"; dots.appendChild(e); }
+}
+
+function openNote(day){
+  currentDay = day;
+  document.getElementById("cDay").textContent = day + ".";
+  document.getElementById("cText").textContent = CH[day-1];
+  document.getElementById("cDoodle").innerHTML = DOODLES[DOODLE_OF[day-1]];
+  setDoneBtn();
+  overlay.classList.add("open");
+  document.getElementById("cDone").focus();
+}
+function setDoneBtn(){
+  const b = document.getElementById("cDone"), done = state.done.includes(currentDay);
+  b.textContent = done ? "Splnené ✓" : "Hotovo, splnené";
+  b.classList.toggle("is-done", done);
+}
+function closeNote(){
+  overlay.classList.remove("open");
+  const day = currentDay; currentDay = null;
+  render();
+  const el = grid.querySelector('[data-day="' + day + '"]'); if(el) el.focus();
+}
+document.getElementById("cDone").addEventListener("click", () => {
+  const i = state.done.indexOf(currentDay);
+  if(i === -1) state.done.push(currentDay); else state.done.splice(i,1);
+  save(); setDoneBtn();
+});
+document.getElementById("cClose").addEventListener("click", closeNote);
+overlay.addEventListener("click", e => { if(e.target === overlay) closeNote(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && overlay.classList.contains("open")) closeNote(); });
+function showToast(msg){
+  toast.textContent = msg; toast.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove("show"), 2600);
+}
+const TARGET = new Date(2026, 11, 1, 0, 0, 0);
+const wait = document.getElementById("wait");
+let waitT = null;
+function pl(n, f){ return n === 1 ? f[0] : (n >= 2 && n <= 4 ? f[1] : f[2]); }
+function setCd(id, n, forms){ document.getElementById(id).textContent = n; document.getElementById(id + "l").textContent = pl(n, forms); }
+function tick(){
+  const ms = TARGET - new Date();
+  if(ms <= 0){ closeWait(); render(); return; }
+  const s = Math.floor(ms / 1000);
+  setCd("cdD", Math.floor(s / 86400), ["deň","dni","dní"]);
+  setCd("cdH", Math.floor(s % 86400 / 3600), ["hodina","hodiny","hodín"]);
+  setCd("cdM", Math.floor(s % 3600 / 60), ["minúta","minúty","minút"]);
+  setCd("cdS", s % 60, ["sekunda","sekundy","sekúnd"]);
+}
+function showWait(){
+  if(preview() || new Date() >= TARGET) return;
+  document.getElementById("wDoodle").innerHTML = DOODLES.gift;
+  tick(); clearInterval(waitT); waitT = setInterval(tick, 1000);
+  wait.classList.add("open");
+  document.getElementById("wClose").focus();
+}
+function closeWait(){ wait.classList.remove("open"); clearInterval(waitT); }
+document.getElementById("wClose").addEventListener("click", closeWait);
+wait.addEventListener("click", e => { if(e.target === wait) closeWait(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && wait.classList.contains("open")) closeWait(); });
+
+window.addEventListener("hashchange", () => { if(preview()) closeWait(); render(); });
+render();
+showWait();
+</script>
+</body>
+</html>
